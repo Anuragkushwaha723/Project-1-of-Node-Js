@@ -1,39 +1,5 @@
 const http=require('http');
-const fs=require('fs');
-const server=http.createServer((req,res)=>{
-    const url=req.url;
-    const method=req.method;
-    if(url=='/'){
-        return fs.readFile('message.txt',{encoding : 'utf-8'},(err,data)=>{
-            res.setHeader('Content-Type','text/html');
-            res.write('<html>');
-            res.write('<head><title>My First Page</title></head>');
-            res.write('<body>');
-            res.write(`<p>${data}</p><br>`);
-            res.write('<form action=/message method=POST>');
-            res.write('<input type=text name=message>');
-            res.write('<button>Send the message</button>');
-            res.write('</form>');
-            res.write('</body>');
-            res.write('</html>');
-            return res.end();
-        });
-    }
-
-    if(url=='/message' && method=='POST'){
-        const body=[];
-        req.on('data',(chunk)=>{
-            body.push(chunk);
-        })
-        return req.on('end',()=>{
-            const bodyParsed=Buffer.concat(body).toString();
-            const message=bodyParsed.split('=')[1];
-            fs.writeFile('message.txt',message,(err)=>{
-                res.statusCode=302;
-                res.setHeader('Location','/');
-                return res.end();
-            })
-        })
-    }
-});
+const routes=require('./routes');
+console.log(routes.text);
+const server=http.createServer(routes.handler);
 server.listen(4000);
